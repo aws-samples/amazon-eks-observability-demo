@@ -52,7 +52,7 @@ cd app/
 kubectl apply -f simple-backend/deployment.yml
 kubectl apply -f simple-frontend/deployment.yml
 
-## Make sure to access ingress URL
+## Make sure that the ingress URL can be accessed.
 open http://$(kubectl get ingress simple-frontend -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
 ```
 
