@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-frontend
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: simple-frontend
+  template:
+    metadata:
+      labels:
+        app: simple-frontend
+    spec:
+      containers:
+        - name: web
+          image: public.ecr.aws/q7f3b2t9/simple-frontend:latest
+          imagePullPolicy: Always
+          securityContext:
+            readOnlyRootFilesystem: true
+          ports:
+            - containerPort: 8080
+          env:
+            - name: XRAY_ADDR
+              value: "xray-service.amazon-cloudwatch:2000"
+            - name: BACKEND_ENDPOINT
+              value: "http://simple-backend"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: simple-frontend
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: simple-frontend
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: simple-frontend
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/scheme: internet-facing
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /*
+            pathType: Prefix
+            backend:
+              service:
+                name: simple-frontend
+                port:
+                  number: 80
