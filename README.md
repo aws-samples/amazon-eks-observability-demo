@@ -86,7 +86,23 @@ https://console.aws.amazon.com/cloudwatch/home#container-insights:performance
 
 The step introduces a fluent-bit DaemonSet for sending cluster logs (application, dataplane, host) to CloudWatch Logs
 
-TBD
+```bash
+## Deploy a cloudwatch-agent in the cluster
+npm run cdk diff EKSObservabilityClusterLogging
+npm run cdk deploy EKSObservabilityClusterLogging
+
+## Make sure the fluent-bit have been deployed
+kubectl describe ds -n amazon-cloudwatch fluent-bit
+
+## Access to the sample app for generating logs
+open http://$(kubectl get ingress simple-frontend -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+```
+
+Go to a Log Group for the cluster.
+
+* [Application](https://console.aws.amazon.com/cloudwatch/home#logsV2:log-groups/log-group/$252Faws$252Fcontainerinsights$252Fobservability-demo$252Fapplication)
+* [Data Plane (kubelet)](https://console.aws.amazon.com/cloudwatch/home#logsV2:log-groups/log-group/$252Faws$252Fcontainerinsights$252Fobservability-demo$252Fdataplane)
+* [Node](https://console.aws.amazon.com/cloudwatch/home#logsV2:log-groups/log-group/$252Faws$252Fcontainerinsights$252Fobservability-demo$252Fhost)
 
 ### Clean up
 
@@ -96,6 +112,7 @@ kubectl delete -f simple-backend/deployment.yml
 kubectl delete -f simple-frontend/deployment.yml
 
 cd ../observability
+npm run cdk destroy EKSObservabilityClusterLogging
 npm run cdk destroy EKSObservabilityContainerInsights
 npm run cdk destroy EKSObservabilityCloudWatchNamespace
 
