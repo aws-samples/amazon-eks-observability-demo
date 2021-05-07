@@ -106,14 +106,14 @@ Go to a Log Group for the cluster.
 
 ### Set up application tracing using AWS X-Ray
 
-The step introduces a fluent-bit DaemonSet for sending cluster logs (application, dataplane, host) to CloudWatch Logs
+The step introduces a X-Ray DaemonSet for sending application trace data.
 
 ```bash
-## Deploy a cloudwatch-agent in the cluster
+## Deploy a X-Ray agent in the cluster
 npm run cdk diff EKSObservabilityXRay
 npm run cdk deploy EKSObservabilityXRay
 
-## Make sure the fluent-bit have been deployed
+## Make sure the agent have been deployed
 kubectl describe ds -n amazon-cloudwatch xray-daemon
 
 ## Restart sample apps for a new DNS info of X-Ray Daemon
@@ -126,6 +126,25 @@ open http://$(kubectl get ingress simple-frontend -o jsonpath='{.status.loadBala
 
 Go to [X-Ray Console](https://console.aws.amazon.com/xray/home#/service-map)
 
+### Set up CloudWatch agent for Prometheus metrics
+
+The step introduces a CloudWatch Agent for Prometheus for sending Prometheus metrics as log data to CloudWatch Logs.
+
+```bash
+## Deploy a cwagent-prometheus in the cluster
+npm run cdk diff EKSObservabilityPrometheusCloudWatch
+npm run cdk deploy EKSObservabilityPrometheusCloudWatch
+
+## Make sure the cwagent-prometheus have been deployed
+kubectl describe deploy -n amazon-cloudwatch cwagent-prometheus
+```
+
+Go to [Prometheus metrics (EMF log)](https://console.aws.amazon.com/cloudwatch/home#logsV2:log-groups/log-group/$252Faws$252Fcontainerinsights$252Fobservability-demo$252Fprometheus)
+
+Go to custome metrics on CloudWatch: `ContainerInsights/Prometheus`
+
+![metrics page](images/prometheus-cloudwatch.png)
+
 ### Clean up
 
 ```bash
@@ -134,6 +153,7 @@ kubectl delete -f simple-backend/deployment.yml
 kubectl delete -f simple-frontend/deployment.yml
 
 cd ../observability
+npm run cdk destroy EKSObservabilityPrometheusCloudWatch
 npm run cdk destroy EKSObservabilityXRay
 npm run cdk destroy EKSObservabilityClusterLogging
 npm run cdk destroy EKSObservabilityContainerInsights
