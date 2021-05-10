@@ -175,6 +175,7 @@ Go to [X-Ray Console](https://console.aws.amazon.com/xray/home#/service-map)
 cd apps
 kubectl delete -f simple-backend/deployment.yml
 kubectl delete -f simple-frontend/deployment.yml
+kubectl delete -f simple-frontend-otel/deployment.yml 
 
 cd ../observability
 aws --region $APS_REGION amp delete-workspace --workspace-id $APS_WORKSPACE_ID
