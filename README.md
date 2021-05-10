@@ -145,6 +145,23 @@ Go to custome metrics on CloudWatch: `ContainerInsights/Prometheus`
 
 ![metrics page](images/prometheus-cloudwatch.png)
 
+### Set up Amazon Managed Service for Prometheus and AWS Distro for OpenTelemetry
+
+```bash
+export APS_REGION=us-west-2
+export APS_WORKSPACE_ID=$(aws --region $APS_REGION amp create-workspace --query workspaceId --output text)
+export APS_REMOTE_WRITE_ENDPOINT=https://aps-workspaces.$APS_REGION.amazonaws.com/workspaces/$APS_WORKSPACE_ID/api/v1/remote_write
+
+envsubst < resources/adot-configmap.yaml > dist/adot-configmap.yaml
+npm run cdk diff EKSObservabilityOpenTelemetry
+npm run cdk deploy EKSObservabilityOpenTelemetry
+
+kubectl get all -n adot-col
+
+# Get Metrics by using awscurl(https://github.com/okigan/awscurl)
+awscurl --service="aps" --region="$APS_REGION" "https://aps-workspaces.$APS_REGION.amazonaws.com/workspaces/$APS_WORKSPACE_ID/api/v1/query?query=adot_rest_client_requests_total"
+```
+
 ### Clean up
 
 ```bash
@@ -153,6 +170,8 @@ kubectl delete -f simple-backend/deployment.yml
 kubectl delete -f simple-frontend/deployment.yml
 
 cd ../observability
+aws --region $APS_REGION amp delete-workspace --workspace-id $APS_WORKSPACE_ID
+npm run cdk destroy EKSObservabilityOpenTelemetry
 npm run cdk destroy EKSObservabilityPrometheusCloudWatch
 npm run cdk destroy EKSObservabilityXRay
 npm run cdk destroy EKSObservabilityClusterLogging
