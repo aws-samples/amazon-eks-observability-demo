@@ -160,7 +160,14 @@ kubectl get all -n adot-col
 
 # Get Metrics by using awscurl(https://github.com/okigan/awscurl)
 awscurl --service="aps" --region="$APS_REGION" "https://aps-workspaces.$APS_REGION.amazonaws.com/workspaces/$APS_WORKSPACE_ID/api/v1/query?query=adot_rest_client_requests_total"
+
+## Deploy sample apps using X-Ray via OpenTelemetry
+cd ../
+kubectl apply -f apps/simple-frontend-otel/deployment.yml 
+open http://$(kubectl get ingress simple-frontend-otel -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')/hello-world
 ```
+
+Go to [X-Ray Console](https://console.aws.amazon.com/xray/home#/service-map)
 
 ### Clean up
 
