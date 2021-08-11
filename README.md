@@ -25,6 +25,13 @@ export CFN_EXPORT_NAME_CLUSTER_NAME=EKSObservabilityDemoClusterName
 export CFN_EXPORT_NAME_OIDC_PROVIDER_ARN=EKSObservabilityDemoOIDCProviderArn
 export CFN_EXPORT_NAME_KUBECTL_ROLE_ARN=EKSObservabilityDemoKubectlRoleArn
 ```
+### Install Prerequisites for Utility Code
+
+```bash
+cd utils/
+## install prequisites for utility classes
+npm i
+```
 
 ### Create a cluster for this demo
 
