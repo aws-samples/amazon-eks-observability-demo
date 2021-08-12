@@ -38,7 +38,7 @@ export class OpenTelemetryStack extends cdk.Stack {
 
     // OpenTelemetry Agent
     const configMap = applyManifest(
-      path.resolve("dist/adot-configmap.yaml"), cluster);
+      path.resolve("resources/adot-configmap.yaml"), cluster);
     configMap.node.addDependency(namespace);
 
     const daemonSet = applyManifest(
